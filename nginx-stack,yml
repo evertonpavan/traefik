@@ -1,0 +1,26 @@
+version: "3.1"
+ 
+services:
+  
+  api:
+    image: nginx:latest
+    deploy:
+      labels:
+        - "traefik.backend=api"
+        - "traefik.frontend.rule=Host:api.sertao.ifrs.edu.br"
+        - "traefik.enable=true"
+        - "traefik.port=80"
+        - "traefik.backend.loadbalancer.method=drr"
+        - "traefik.docker.network=traefik-net"    
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+         constraints: [node.role == manager]
+#        constraints:
+#          - node.role != manager        
+    networks:
+      - traefik-net
