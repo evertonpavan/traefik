@@ -1,5 +1,5 @@
 # Antes criar network
-docker network create --driver=overlay traefik-net
+docker network create --driver=overlay traefik-net --external=true
 
 
 # Rodar Traefik no docker 
