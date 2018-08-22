@@ -4,7 +4,7 @@ docker network create --driver=overlay traefik-net
 
 # Rodar Traefik no docker 
 
-docker service create --name traefik --constraint 'node.role==manager' --publish 80:80 --publish 8080:8080 --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock --network traefik-net traefik:latest --docker --docker.swarmmode --docker.domain=traefik.sertao.ifrs.edu.br --docker.watch --logLevel=DEBUG --web
+docker service create --name traefik --constraint 'node.role==manager' --publish 80:80 -publish 443:443 --publish 8080:8080 --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock --network traefik-net traefik:latest --docker --docker.swarmmode --docker.domain=traefik.sertao.ifrs.edu.br --docker.watch --logLevel=DEBUG --web
 
 
 
