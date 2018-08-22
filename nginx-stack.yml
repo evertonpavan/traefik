@@ -1,17 +1,23 @@
-version: "3.1"
- 
+
+version: "3.3"
+
 services:
-  
-  api:
+  nginx:
     image: nginx:latest
+    ports:
+     - 8181:80
+    networks:
+     - traefik-net
+     - default
     deploy:
       labels:
-        - "traefik.backend=api"
-        - "traefik.frontend.rule=Host:api.sertao.ifrs.edu.br"
+        - "traefik.backend=nginx"
+        - "traefik.frontend.rule=Host:nginx.sertao.ifrs.edu.br"
         - "traefik.enable=true"
         - "traefik.port=80"
-        - "traefik.backend.loadbalancer.method=drr"
-        - "traefik.docker.network=traefik-net"    
+#        - "traefik.backend.loadbalancer.swarm=true"
+#        - "traefik.backend.loadbalancer.method=drr"
+        - "traefik.docker.network=traefik-net"
       replicas: 1
       update_config:
         parallelism: 2
@@ -21,6 +27,9 @@ services:
       placement:
          constraints: [node.role == manager]
 #        constraints:
-#          - node.role != manager        
-    networks:
-      - traefik-net
+#          - node.role != manager
+
+networks:
+   traefik-net:
+     external: true
+
