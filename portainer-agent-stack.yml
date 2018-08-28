@@ -36,7 +36,7 @@ services:
         constraints: [node.role == manager]
       labels:
         - "traefik.docker.network=traefik-net"
-        - "traefik.frontend.rule=Host:portainer.sertao.ifrs.portainer-agent-stack.yml edu.br"
+        - "traefik.frontend.rule=Host:portainer.sertao.ifrs.edu.br"
         - "traefik.port=9000"
         - "traefik.backend=portainer-dev"
 
