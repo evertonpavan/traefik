@@ -1,9 +1,10 @@
-ersion: '3'
+version: '3'
 services:
   mariadb:
     image: 'bitnami/mariadb:latest'
     networks:
       - traefik-net
+      - moodle-net
     ports:
       - '3306'
     environment:
@@ -22,7 +23,7 @@ services:
         constraints: [node.role == manager]
       labels:
         - "traefik.docker.network=traefik-net"
-#        - "traefik.frontend.rule=Host:moodledev.sertao.ifrs.edu.br"
+#        - "traefik.frontend.rule=Host:mariadbdevdev.sertao.ifrs.edu.br"
         - "traefik.port=3306"
         - "traefik.backend=moodle-mariadb"
 
@@ -30,14 +31,15 @@ services:
     image: 'bitnami/moodle:latest'
     networks:
       - traefik-net
+      - moodle-net
     env_file: .env
     volumes:
       - '/docker/projetos/moodle/moodle-data/:/bitnami'
     depends_on:
       - mariadb
-#    ports:
-#      - '80:80'
-#      - '443:443'
+    ports:
+      - '180:80'
+      - '1443:443'
     deploy:
       mode: replicated
       replicas: 1
@@ -49,15 +51,45 @@ services:
         - "traefik.port=80"
         - "traefik.backend=moodle-data"
 
+phpmyadmin:
+    image: bitnami/phpmyadmin:latest
+    depends_on:
+      - mariadb
+    ports:
+      - '280:80'
+      - '2443:443'
+#    environment:
+#      - PHPMYADMIN_ALLOW_NO_PASSWORD=false
+#      - PHPMYADMIN_ALLOW_ARBITRARY_SERVER=true
+    networks:
+      - traefik-net
+      - moodle-net
+    env_file: .env-phpmyadmin
+    volumes:
+      - '/docker/projetos/moodle/moodle-phpmyadmin:/bitnami'
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - "traefik.docker.network=traefik-net"
+        - "traefik.frontend.rule=Host:phpmyadmindev.sertao.ifrs.edu.br"
+        - "traefik.port=80"
+        - "traefik.backend=moodle-phpmyadmin"
 
 networks:
   traefik-net:
      external: true
+  moodle-net:
+    driver: overlay
+
 
 volumes:
   moodle-mariadb:
     driver: local
   moodle-data:
     driver: local
-
+  moodle-phpmyadmin:
+    driver: local
 
