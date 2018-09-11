@@ -1,0 +1,48 @@
+version: '3'
+services:
+
+  rocketchat:
+    image: rocket.chat:latest
+    volumes:
+      - ./rocket_uploads:/app/uploads
+    networks:
+      - traefik-net
+      - rocket-net
+    env_file: .env-rocket
+    environment:
+      - PORT=3000
+      - ROOT_URL=http://localhost:3000
+      - MONGO_URL=mongodb://mongo:27017/rocketchat
+      - MONGO_OPLOG_URL=mongodb://mongo:27017/local
+#      - MAIL_URL=smtp://user:pass@smtp.email
+#      - HTTP_PROXY=http://proxy.domain.com
+#      - HTTPS_PROXY=http://proxy.domain.com
+#      - LDAP_Enable=true
+#      - LDAP_BaseDN=dc=campus,dc=sertao,dc=ifrs,dc=edu,dc=br
+    depends_on:
+      - mongo
+    ports:
+      - 3000:3000
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - "traefik.docker.network=traefik-net"
+        - "traefik.frontend.rule=Host:rocketdev.sertao.ifrs.edu.br"
+        - "traefik.port=3000"
+        - "traefik.backend=rocket.chat"
+
+
+  mongo:
+    image: mongo:3.2
+    volumes:
+     - ./mongodb_data:/data/db
+     #- ./data/dump:/dump
+    command: mongod --smallfiles --oplogSize 128 --replSet rs0
+    networks:
+      - traefik-net
+      - rocket-net
+      
+  
