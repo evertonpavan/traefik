@@ -1,5 +1,8 @@
 version: '3.3'
 
+# Antes de rodar essa stack você deve criar network com o comando abaixo:
+# docker network create --driver=overlay traefik-net
+
 services:
   traefik:
     image: traefik
